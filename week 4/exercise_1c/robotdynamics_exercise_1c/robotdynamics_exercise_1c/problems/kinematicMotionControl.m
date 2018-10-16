@@ -5,7 +5,15 @@ function [ Dq ] = kinematicMotionControl(q, r_des, v_des)
 % v_des       : desired end effector velocity
 % Output: joint-space velocity command of the robot.
 
-% Compute the updated joint velocities. This would be used for a velocity controllable robot
-% TODO:
-Dq = 0.1*ones(6,1);
+% TODO: User defined linear position gain
+K_p = 5;
+
+% TODO: User defined pseudo-inverse damping coefficient
+lambda = 0.1;
+
+r_current = jointToPosition_solution(q);
+J_current = jointToPosJac_solution(q);
+
+v_command = v_des + K_p*(r_des - r_current);
+Dq = pseudoInverseMat_solution(J_current, lambda) * v_command;
 end

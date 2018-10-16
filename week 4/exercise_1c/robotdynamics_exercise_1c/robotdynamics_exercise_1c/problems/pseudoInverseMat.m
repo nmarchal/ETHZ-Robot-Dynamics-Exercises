@@ -7,5 +7,10 @@ function [ pinvA ] = pseudoInverseMat(A, lambda)
 
 % TODO: complete the computation of the pseudo-inverse.
 % Hint: How should we account for both left and right pseudo-inverse forms?
-pinvA = zeros(n, m);
+if m>=n
+    pinvA = inv(A'*A + (lambda^2)*eye(n)) * A' ;
+else
+    pinvA = A' * inv(A*A' + (lambda^2)*eye(m)) ;
+end
+
 end
