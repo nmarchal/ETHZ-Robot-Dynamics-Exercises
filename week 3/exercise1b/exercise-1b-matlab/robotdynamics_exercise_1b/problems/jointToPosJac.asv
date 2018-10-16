@@ -1,7 +1,7 @@
-function J_R = jointToRotJac(q)
+function J_P = jointToPosJac(q)
   % Input: vector of generalized coordinates (joint angles)
-  % Output: Jacobian of the end-effector orientation which maps joint
-  % velocities to end-effector angular velocities in I frame.
+  % Output: Jacobian of the end-effector translation which maps joint
+  % velocities to end-effector linear velocities in I frame.
 
 %   Individual transformation matrices 
   T01 = jointToTransform01(q) ;
@@ -31,7 +31,7 @@ function J_R = jointToRotJac(q)
   y = [0;1;0] ;
   z = [0;0;1] ;
   
-%   all the rotations axis in inertial frame 
+%   all the axis in inertial frame 
   n1 = C01*z ; 
   n2 = C02*y ; 
   n3 = C03*y ; 
@@ -39,6 +39,7 @@ function J_R = jointToRotJac(q)
   n5 = C05*y ; 
   n6 = C06*x ; 
   
-  %Jacobian (rotation) solution
+  
   J_R = [n1 n2 n3 n4 n5 n6] ;
+    
 end
