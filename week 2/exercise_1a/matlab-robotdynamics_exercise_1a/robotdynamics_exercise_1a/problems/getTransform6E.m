@@ -3,6 +3,6 @@ function T6E = getTransform6E()
   % Output: homogeneous transformation Matrix from the end-effector frame E to frame 6. T_6E
   
   % PLACEHOLDER FOR OUTPUT -> REPLACE WITH SOLUTION
-  T6E = zeros(4);
+  T6E = eye(4);
 end
 
