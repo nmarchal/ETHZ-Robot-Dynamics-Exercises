@@ -30,6 +30,11 @@ eom.hamiltonian = sym(zeros(1,1));
 fprintf('Computing mass matrix M... ');
 % TODO: Implement M = ...;
 M = sym(zeros(6,6));
+for i = 1:6
+   I_I_s = R_Ik{i}*k_I_s{i}*R_Ik{i}' ;
+   M = M + I_Jp_s{i}'*m{i}*I_Jp_s{i} + I_Jr{i}'*I_I_s*I_Jr{i} ;
+end
+    
 fprintf('done!\n');
 
 
@@ -37,24 +42,41 @@ fprintf('done!\n');
 fprintf('Computing gravity vector g... ');
 % TODO: Implement g = ...;
 g = sym(zeros(6,1));
+for i = 1:6
+    g = g - I_Jp_s{i}'* m{i}*I_g_acc ;
+end
 fprintf('done!\n');
-
 
 %% Compute nonlinear terms vector
 fprintf('Computing coriolis and centrifugal vector b and simplifying... ');
 % TODO: Implement b = ...;
 b = sym(zeros(6,1));
+for i = 1:6
+    I_I_s = R_Ik{i}*k_I_s{i}*R_Ik{i}' ;
+    I_Jr_dot = dAdt( I_Jr{i},phi,dphi) ;
+    I_Jp_s_dot = dAdt(I_Jp_s{i},phi,dphi) ;
+    b = b + I_Jp_s{i}'*m{i}*I_Jp_s_dot * dphi + ...
+            I_Jr{i}'*I_I_s*I_Jr_dot * dphi + ...
+            I_Jr{i}'*cross((I_Jr{i}*dphi),(I_I_s *(I_Jr{i}*dphi))) ;
+end
 fprintf('done!\n');
 
 
 %% Compute energy
 fprintf('Computing total energy... ');
 % TODO: Implement hamiltonian, enPot, enKin = ...;
-hamiltonian = sym(zeros(1,1));
-enPot = sym(zeros(1,1));
-enKin = sym(zeros(1,1));
-fprintf('done!\n');
 
+enPot = sym(zeros(1,1));
+for i = 1:6
+   I_r_ks = R_Ik{i}*k_r_ks{i};
+   enPot = enPot - I_r_ks' * I_g_acc * m{i} ;
+end
+
+enKin = sym(zeros(1,1));
+enKin = 1/2*dphi'*M*dphi ;
+
+hamiltonian = enKin + enPot ;
+fprintf('done!\n');
 
 %% Generate matlab functions
 fname = mfilename;
