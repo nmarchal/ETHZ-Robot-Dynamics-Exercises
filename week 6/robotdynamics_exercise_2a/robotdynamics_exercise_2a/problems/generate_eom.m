@@ -68,7 +68,7 @@ fprintf('Computing total energy... ');
 
 enPot = sym(zeros(1,1));
 for i = 1:6
-   I_r_ks = R_Ik{i}*k_r_ks{i};
+   I_r_ks = [eye(3) zeros(3,1)]*T_Ik{i}*[k_r_ks{i};1]
    enPot = enPot - I_r_ks' * I_g_acc * m{i} ;
 end
 
@@ -76,6 +76,10 @@ enKin = sym(zeros(1,1));
 enKin = 1/2*dphi'*M*dphi ;
 
 hamiltonian = enKin + enPot ;
+fprintf('simplifying... ');
+hamiltonian = simplify(hamiltonian); 
+fprintf('done!\n');
+
 fprintf('done!\n');
 
 %% Generate matlab functions
