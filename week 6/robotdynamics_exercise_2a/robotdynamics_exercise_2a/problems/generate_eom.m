@@ -15,7 +15,7 @@ R_Ik = kin.R_Ik;        % Rotation matrices (6x1 cell)->(3x3 sym)
 
 k_I_s = dyn.k_I_s;      % Inertia tensor of body k (6x1 cell)->(3x3 sym)
 m = dyn.m;              % Mass of body k (6x1 cell)->(1x1 double)
-I_g_acc = dyn.I_g_acc;  % Gravitational acceleration in inertial frame (3x1 double)
+I_g_acc = dyn.I_g_acc  % Gravitational acceleration in inertial frame (3x1 double)
 k_r_ks = dyn.k_r_ks;    % CoM location of body k in frame k (6x1 cell)->(3x1 double)
 
 I_Jp_s = jac.I_Jp_s;    % CoM Positional Jacobian (6x1 cell)->(3x6 sym)

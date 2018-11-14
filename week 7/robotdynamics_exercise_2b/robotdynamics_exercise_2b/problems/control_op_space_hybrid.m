@@ -12,8 +12,11 @@ function [ tau ] = control_op_space_hybrid( I_r_IE_des, eul_IE_des, q, dq, I_F_E
 %   direction
 
 % Design the control gains
-kp = 0; % TODO
-kd = 0; % TODO
+% Design the control gains
+kp = 50.0;
+kd = 2.0*sqrt(kp);
+kpMat = kp * diag([1.0 1.0 1.0 1.0 1.0 1.0]);
+kdMat = kd * diag([1.0 1.0 1.0 1.0 1.0 1.0]);
 
 % Desired end-effector force
 I_F_E = [I_F_E_x, 0.0, 0.0, 0.0, 0.0, 0.0]';
@@ -36,17 +39,26 @@ chi_err = [I_r_IE_des - I_r_IE;
 
 % Project the joint-space dynamics to the operational space
 % TODO
-% lambda = ... ;
-% mu = ... ;
-% p =  ... ;
+M = M_fun_solution(q);
+b = b_fun_solution(q, dq);
+g = g_fun_solution(q);
+lambda = pseudoInverseMat_solution(I_Je/M*I_Je',0.01) ;
+mu = lambda*I_Je*inv(M)*b - lambda*I_dJ_e*dq ;
+p =  lambda*I_Je/M*g ;
 
-% Define the motion and force selection matrices.
-% TODO
-% Sm = ... ;
-% Sf = ... ;
+% %Define the motion and force selection matrices.
+% sigma = [diag([0 1 1])] ;
+% sm = [C_IE*sigma*C_IE' zeros(3,3) ; zeros(3,3) C_IE*sigma*C_IE' ]
+Sm = eye(6);
+Sm(1,1) = 0 ;
+Sm(4,4) = 0 ;
+Sf = eye(6) - Sm ;
+
+%do some control (zero target velocity)
+omega_dot = kpMat*(chi_err)+kdMat*(0-I_Je*dq) ;
 
 % Design a controller which implements the operational-space inverse
 % dynamics and exerts a desired force.
-tau = zeros(6,1); % TODO
+tau = I_Je'*(lambda*Sm*omega_dot + Sf*I_F_E + mu + p);
 
 end

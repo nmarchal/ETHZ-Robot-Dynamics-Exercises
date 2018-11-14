@@ -10,8 +10,11 @@ function [ tau ] = control_inv_dyn(I_r_IE_des, eul_IE_des, q, q_dot)
 % q_dot --> a vector in R^n of measured joint velocities
 
 % Set the joint-space control gains.
-kp = 0; % TODO
-kd = 0; % TODO
+kp = 10.0;
+kd = 2.0*sqrt(kp);
+
+kpMat = kp * diag([1.0 1.0 1.0 1.0 1.0 1.0]);
+kdMat = kd * diag([1.0 1.0 1.0 1.0 1.0 1.0]);
 
 % Find jacobians, positions and orientation based on the current
 % measurements.
@@ -32,6 +35,14 @@ chi_err = [I_r_IE_des - I_r_Ie;
 
 % PD law, the orientation feedback is a torque around error rotation axis
 % proportional to the error angle.
-tau = zeros(6, 1); % TODO
+M = M_fun_solution(q) ;
+b = b_fun_solution(q,q_dot) ;
+g = g_fun_solution(q) ;
+omega = I_J_e*q_dot ;
+
+omega_dot_des = kpMat*(chi_err)+kdMat*(0-omega) ;
+q_dot_dot = pseudoInverseMat_solution(I_J_e, 0.1)*(omega_dot_des - I_dJ_e*q_dot);
+
+tau = M*q_dot_dot + b + g ;
 
 end
