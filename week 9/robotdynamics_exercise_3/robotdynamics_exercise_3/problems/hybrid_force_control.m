@@ -63,24 +63,29 @@ F_des = [-0.7, 0, 0]';  % Force from wall to robot
 % x = [qdd', f_c', tau', F_EE']
 
 % Equations of motions
-A_eom = [];
-b_eom = [];
+A_eom = [M, -I_J_c', -S', -I_J_EE'];
+b_eom = -b -g;
 
 % No foot contact motions
-A_c = [];
-b_c = [];
+A_c = [I_J_c, zeros(4, 4), zeros(4, 7), zeros(4,3)];
+b_c = -I_Jd_c*qd;
 
 % Constant EE position in z direction
-A_pos_EE = [];
-b_pos_EE = [];
+kp = 5;
+kd = 2*sqrt(kp);
+A_pos_EE = [I_J_EE(2,:), zeros(1, 4), zeros(1, 7), zeros(1,3)];
+b_pos_EE = -I_Jd_EE(2,:)*qd + kp*(z_EE_des - I_r_EE_z) - kd*I_v_EE_z;
 
 % EE force 
-A_EE = [];
-b_EE = [];
+A_EE = [zeros(3, 10), zeros(3, 4), zeros(3, 7), eye(3)];
+b_EE = F_des;
 
 % Body motion
-A_b = [];
-b_b = [];
+kp = 2;
+kd = 2*sqrt(kp);
+wd_b = kp*(q_b_des - q(1:3)) + kd*(qd_b_des - qd(1:3));
+A_b = [I_J_b, zeros(3, 4), zeros(3, 7), zeros(3, 3)];
+b_b = wd_b - I_Jd_b*qd;
 
 % ===== Additional objectives and constraints ============
 % Kinematic null space position control

@@ -13,6 +13,7 @@ function [ tau ] = floating_body_control(model, t, state)
 
 q = state(1:10); % [10x1] Generalized coordinates [q_b, q_F, q_H, q_A]'
 qd = state(11:20); % [10X1] Generalized velocities
+u = qd ;
 
 % Extract dynamics at current state
 params = model.parameters.values;
@@ -51,16 +52,19 @@ qd_b_des = amplitude.*frequency.*cos(frequency*t);
 % x = [qdd', f_c', tau']
 
 % Equations of motions
-A_eom = [];
-b_eom = [];
+A_eom = [M -I_J_c' -S'];
+b_eom = -b-g ;
 
 % No foot contact motions
-A_c = [];
-b_c = [];
+A_c = [I_J_c zeros(4,4) zeros(4, 7)];
+b_c = [- I_Jd_c*qd];
 
 % Body motion
-A_b = [];
-b_b = [];
+kp = 10;
+kd = 2*sqrt(kp);
+wd_b = kp*(q_b_des - q(1:3)) + kd*(qd_b_des - qd(1:3));
+A_b = [I_J_b, zeros(3, 4), zeros(3, 7)];
+b_b =  wd_b - I_Jd_b*qd;
 
 % ===== Additional objectives and constraints ============
 % Kinematic null space position control
